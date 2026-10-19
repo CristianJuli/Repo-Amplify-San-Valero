@@ -29,7 +29,7 @@ function App() {
   return (
     <main className="container">
       <header>
-        <h1>Cloud Messages v2</h1>
+        <h1>Cloud Messages V3</h1>
         <p className="subtitle">React + GitHub + AWS Amplify</p>
       </header>
 
