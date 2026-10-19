@@ -1,40 +1,46 @@
-import { useState } from 'react';
+import { useState } from 'react'
 
 function App() {
-  const [name, setName] = useState('');
-  const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([]);
+  const [name, setName] = useState('')
+  const [message, setMessage] = useState('')
+  const [messages, setMessages] = useState([])
 
   function handleSubmit(event) {
-    event.preventDefault();
+    event.preventDefault()
 
-    if (!name.trim() || !message.trim()) {
-      return;
+    const cleanName = name.trim()
+    const cleanMessage = message.trim()
+
+    if (!cleanName || !cleanMessage) {
+      return
     }
 
     const newMessage = {
       id: Date.now(),
-      name: name.trim(),
-      message: message.trim(),
-    };
+      name: cleanName,
+      message: cleanMessage,
+    }
 
-    setMessages((currentMessages) => [newMessage, ...currentMessages]);
-    setName('');
-    setMessage('');
+    setMessages((currentMessages) => [newMessage, ...currentMessages])
+    setName('')
+    setMessage('')
   }
 
   return (
     <main className="container">
-      <h1>Cloud Messages</h1>
-      <p className="subtitle">React + GitHub + AWS Amplify</p>
+      <header>
+        <h1>Cloud Messages</h1>
+        <p className="subtitle">React + GitHub + AWS Amplify</p>
+      </header>
 
       <form className="card" onSubmit={handleSubmit}>
         <label htmlFor="name">Nombre</label>
         <input
           id="name"
+          type="text"
           value={name}
           onChange={(event) => setName(event.target.value)}
-          placeholder="Tu nombre"
+          placeholder="Escribe tu nombre"
         />
 
         <label htmlFor="message">Mensaje</label>
@@ -46,7 +52,7 @@ function App() {
           rows="4"
         />
 
-        <button type="submit">Guardar</button>
+        <button type="submit">Guardar mensaje</button>
       </form>
 
       <section className="messages">
@@ -64,7 +70,7 @@ function App() {
         )}
       </section>
     </main>
-  );
+  )
 }
 
-export default App;
+export default App

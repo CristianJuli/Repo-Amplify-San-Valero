@@ -1,6 +1,11 @@
 # Cloud Messages Demo
 
-Aplicacion React minima para una demo de AWS Amplify.
+Aplicación React mínima para probar un workshop con GitHub y AWS Amplify.
+
+## Requisitos
+
+- Node.js 18 o superior
+- npm
 
 ## Ejecutar en local
 
@@ -9,10 +14,23 @@ npm install
 npm run dev
 ```
 
-En esta primera version los mensajes se guardan solo en memoria y desaparecen al recargar la pagina.
+## Generar build de producción
 
-Siguientes pasos de la demo:
-1. Subir a GitHub.
-2. Conectar el repositorio con AWS Amplify Hosting.
-3. Anadir Amplify Data / AppSync / DynamoDB.
-4. Modificar el modelo y el formulario.
+```bash
+npm run build
+npm run preview
+```
+
+El build se genera en `dist/`.
+
+## Estado inicial
+
+Los mensajes se guardan únicamente en memoria. Al recargar la página desaparecen.
+
+## Evolución prevista
+
+1. Subir el proyecto a GitHub.
+2. Desplegarlo con AWS Amplify Hosting.
+3. Conectar Amplify Data / AWS AppSync / Amazon DynamoDB.
+4. Persistir los mensajes.
+5. Añadir un nuevo campo al formulario y al modelo de datos.
