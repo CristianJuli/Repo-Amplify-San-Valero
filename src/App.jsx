@@ -1,11 +1,55 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { generateClient } from 'aws-amplify/data'
+
+const client = generateClient()
 
 function App() {
   const [name, setName] = useState('')
   const [message, setMessage] = useState('')
   const [messages, setMessages] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [error, setError] = useState('')
 
-  function handleSubmit(event) {
+  useEffect(() => {
+    let isActive = true
+
+    async function loadMessages() {
+      try {
+        const { data, errors } = await client.models.Message.list()
+
+        if (errors?.length) {
+          throw new Error('No se pudieron cargar los mensajes.')
+        }
+
+        if (isActive) {
+          setMessages(
+            [...data].sort(
+              (first, second) =>
+                new Date(second.createdAt).getTime() -
+                new Date(first.createdAt).getTime(),
+            ),
+          )
+        }
+      } catch {
+        if (isActive) {
+          setError('No se pudieron cargar los mensajes.')
+        }
+      } finally {
+        if (isActive) {
+          setIsLoading(false)
+        }
+      }
+    }
+
+    loadMessages()
+
+    return () => {
+      isActive = false
+    }
+  }, [])
+
+  async function handleSubmit(event) {
     event.preventDefault()
 
     const cleanName = name.trim()
@@ -15,15 +59,27 @@ function App() {
       return
     }
 
-    const newMessage = {
-      id: Date.now(),
-      name: cleanName,
-      message: cleanMessage,
-    }
+    setError('')
+    setIsSaving(true)
 
-    setMessages((currentMessages) => [newMessage, ...currentMessages])
-    setName('')
-    setMessage('')
+    try {
+      const { data: newMessage, errors } = await client.models.Message.create({
+        name: cleanName,
+        message: cleanMessage,
+      })
+
+      if (errors?.length || !newMessage) {
+        throw new Error('No se pudo guardar el mensaje.')
+      }
+
+      setMessages((currentMessages) => [newMessage, ...currentMessages])
+      setName('')
+      setMessage('')
+    } catch {
+      setError('No se pudo guardar el mensaje. Comprueba la conexión e inténtalo de nuevo.')
+    } finally {
+      setIsSaving(false)
+    }
   }
 
   return (
@@ -34,10 +90,13 @@ function App() {
       </header>
 
       <form className="card" onSubmit={handleSubmit}>
+        {error && <p className="error" role="alert">{error}</p>}
+
         <label htmlFor="name">Nombre</label>
         <input
           id="name"
           type="text"
+          required
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Escribe tu nombre"
@@ -46,19 +105,24 @@ function App() {
         <label htmlFor="message">Mensaje</label>
         <textarea
           id="message"
+          required
           value={message}
           onChange={(event) => setMessage(event.target.value)}
           placeholder="Escribe un mensaje"
           rows="4"
         />
 
-        <button type="submit">Guardar mensaje</button>
+        <button type="submit" disabled={isSaving}>
+          {isSaving ? 'Guardando...' : 'Guardar mensaje'}
+        </button>
       </form>
 
       <section className="messages">
         <h2>Mensajes</h2>
 
-        {messages.length === 0 ? (
+        {isLoading ? (
+          <p className="empty">Cargando mensajes...</p>
+        ) : messages.length === 0 && !error ? (
           <p className="empty">Todavía no hay mensajes.</p>
         ) : (
           messages.map((item) => (
